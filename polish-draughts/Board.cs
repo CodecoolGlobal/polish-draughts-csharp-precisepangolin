@@ -5,8 +5,8 @@ using System.Security.Cryptography.X509Certificates;
 
 public class Board
 {
-    public string whiteTile = " ##### ";
-    public string blackTile = "       ";
+    public string whiteTile = "       ";
+    public string blackTile = "#######";
     public string whitePawn = "(WHITE)";
     public string blackPawn = "(BLACK)";
     public int n;
@@ -15,11 +15,6 @@ public class Board
 
     public string[,] GenerateEmptyBoard(int n)
     {
-        if (Process.GetCurrentProcess().MainWindowTitle != "")
-        {
-            whitePawn = "wh";
-        }
-
         string[,] emptyFields = new string[n, n];
 
         // generate black empty fields
@@ -111,14 +106,26 @@ public class Board
         //Console.Clear();
         string writtenBoard = "";
         string writtenBoardRows = "";
-        string iLetters = "  ";
+        string iLetters = "   |";
+        string letterSeparator = "---+";
         for (int i = 0; i < Fields.GetLength(0); i++)
         {
-            string writtenBoardRow = $"{Convert.ToChar(i + 65)} ";
-            iLetters += ("   " + (i+1) + "  |");
+            string writtenBoardRow = $" {Convert.ToChar(i + 65)} |";
+            string rowSeparator = "---+";
+            letterSeparator += "---------+";
+            if (i < 9) { 
+                iLetters += ("    " + (i + 1) + "    |");
+            }
+            else
+            {
+                iLetters += ("    " + (i + 1) + "   |");
+            };
 
             for (int j = 0; j < Fields.GetLength(1); j++)
             {
+                writtenBoardRow += " ";
+                rowSeparator += "---------+";
+
                 if (Fields[i, j] != null)
                 {
                     writtenBoardRow += Fields[i, j].color;
@@ -127,12 +134,18 @@ public class Board
                 {
                     writtenBoardRow += emptyFields[i,j];
                 }
+
+                writtenBoardRow += " |";
             }
             writtenBoardRow += "\n";
             writtenBoardRows += writtenBoardRow;
+            rowSeparator += "\n";
+            writtenBoardRows += rowSeparator;
         }
         iLetters += "\n";
         writtenBoard += iLetters;
+        letterSeparator += "\n";
+        writtenBoard += letterSeparator;
         writtenBoard += writtenBoardRows;
 
         Console.Write(writtenBoard);
