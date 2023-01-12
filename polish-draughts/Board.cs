@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.Security.Cryptography.X509Certificates;
 
@@ -14,6 +15,11 @@ public class Board
 
     public string[,] GenerateEmptyBoard(int n)
     {
+        if (Process.GetCurrentProcess().MainWindowTitle != "")
+        {
+            whitePawn = "wh";
+        }
+
         string[,] emptyFields = new string[n, n];
 
         // generate black empty fields
@@ -134,7 +140,6 @@ public class Board
 
     public string @ToString((int i, int j) coordinates)
     {
-        string textCoordinates;
         string letter = (Convert.ToChar(coordinates.i + 65)).ToString();
         string digit = (coordinates.j + 1).ToString();
         return letter + digit;
@@ -143,19 +148,30 @@ public class Board
     public (int i, int j) @ToCoordinates(string input)
     {
         (int i, int j) coordinates;
-        char letter = Convert.ToChar(input[0].ToString().ToUpper());
+        char letter;
+        try
+        {  letter = Convert.ToChar(input[0].ToString().ToUpper()); }
+        catch
+        {
+            letter = 'A';
+        };
         int letterValue = (int)letter;
         int i = Convert.ToInt32(letterValue) - 65;
-        int j = 0;
-        Console.WriteLine(input.Length);
-        if (input.Length > 2)
+        int j;
+        if (input.Length == 3)
         {
             string digits = input[1].ToString() + input[2].ToString();
-            Console.WriteLine(digits);
             Int32.TryParse(digits, out j);
         }
         else {
-            Int32.TryParse(input[1].ToString(), out j);
+            try
+            {
+                Int32.TryParse(input[1].ToString(), out j);
+            }
+            catch
+            {
+                j = 0;
+            }
         }
         j -= 1;
         coordinates = (i, j);
@@ -169,8 +185,17 @@ public class Board
         if (Fields[i, j] != null)
         {
             string removedColor = Fields[i, j].color;
+            string verbalRemovedColor;
+            if (removedColor == whitePawn)
+            {
+                verbalRemovedColor = "white";
+            }
+            else
+            {
+                verbalRemovedColor = "black";
+            }
             Fields[i, j] = null;
-            Console.WriteLine($"Removed {removedColor} pawn from {@ToString(coordinates)}");
+            Console.WriteLine($"Removed {verbalRemovedColor} pawn from {@ToString(coordinates)}");
         }
         else
         {
@@ -178,27 +203,56 @@ public class Board
         }
     }
 
-    public void @MovePawn((int i, int j) coordinatesA, (int k, int l) coordinatesB)
+    public bool @MovePawn((int i, int j) coordinatesA, (int k, int l) coordinatesB, string pawnColor)
     {
         int i = coordinatesA.i;
         int j = coordinatesA.j;
         int k = coordinatesB.k;
         int l = coordinatesB.l;
-        if (Fields[i,j] != null && Fields[k,l] == null)
+        string verbalPawnColor;
+        if (pawnColor == whitePawn)
+        { 
+            verbalPawnColor = "white"; }
+        else
         {
-            string pawnColor = Fields[i, j].color;
-            Fields[i, j] = null;
-            Fields[k, l] = new Pawn(pawnColor, (k, l));
-            Console.WriteLine($"Moved {pawnColor} pawn from {@ToString(coordinatesA)} to {@ToString(coordinatesB)}.");
-            
-            if (Fields[(i+k)/2, (j+l)/2] != null && Fields[(i + k) / 2, (j + l) / 2].color != pawnColor)
+            verbalPawnColor = "black";
+        };
+
+        if (Fields[i,j] != null && Fields[i, j].color != pawnColor)
+        {
+
+            Console.WriteLine($"Please select a {verbalPawnColor} pawn!");
+            return false;
+        }
+        if (Fields[i,j] != null && Fields[k,l] == null && Math.Abs(i - k) == Math.Abs(j - l))
+        {
+            Pawn inBetween = Fields[(i + k) / 2, (j + l) / 2];
+
+
+            if (Math.Abs(i - k) == 1 || (Math.Abs(i - k) == 2 && inBetween != null && inBetween.color != pawnColor))
             {
-                @RemovePawn(((i + k) / 2, (j + l) / 2));
+                Fields[i, j] = null;
+                Fields[k, l] = new Pawn(pawnColor, (k, l));
+                Console.WriteLine($"Moved {verbalPawnColor} pawn from {@ToString(coordinatesA)} to {@ToString(coordinatesB)}.");
+                if (Math.Abs(i-k) == 2)
+                {
+                    @RemovePawn(((i + k) / 2, (j + l) / 2));
+                }
+                return true;
             }
+            else
+            {
+                Console.WriteLine($"Cannot move pawn from {@ToString(coordinatesA)} to {@ToString(coordinatesB)}." +
+                    $" \n You cannot jump over your own pawns.");
+                return false;
+            }
+            
         }
         else
         {
-            Console.WriteLine($"Cannot move pawn from {@ToString(coordinatesA)} to {@ToString(coordinatesB)}.");
+            Console.WriteLine($"Cannot move pawn from {@ToString(coordinatesA)} to {@ToString(coordinatesB)}." +
+                $" \nMake sure to move diagonally and that the place is not occupied.");
+            return false;
         }
     }
 

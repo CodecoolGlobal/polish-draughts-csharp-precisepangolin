@@ -2,11 +2,9 @@
 
 public class Game
 {
-    public bool isWon;
-
     public Game()
     {
-        isWon = false;
+
         @Start();
     }
 
@@ -36,7 +34,7 @@ public class Game
     }
 
     public void @Start()
-	{
+    {
         WelcomeMessage();
         int n = 0;
         while (!(n >= 10 && n <= 20))
@@ -48,41 +46,85 @@ public class Game
         Board board = new Board(n);
 
         board.WriteBoard();
-        while (isWon == false)
+        while (CheckForWinner(board) == false)
         {
-            TryToMakeMove(board);
-            board.WriteBoard();
-            CheckForWinner(board);
+            Round(board);
+
         }
 
     }
-	public void @TryToMakeMove(Board board)
+	public bool @TryToMakeMove(Board board, string pawnColor)
 	{
         //checks if the starting position from user input is a valid pawn and if the ending position
         //is within board boundaries.
         //If so, it calls @TryToMakeMove() on pawn instance.
 
         string input = "";
-        while (input.Length < 2)
+        bool correctInput = false;
+        (int i, int j) coordinates;
+        int i;
+        int j;
+        while (input.Length < 2 || correctInput == false)
         {
             Console.WriteLine("Which pawn would you like to move?");
             input = @GetUserInput();
+            (int a, int b) coordinatesTest = board.@ToCoordinates(input);
+            int a = coordinatesTest.a;
+            int b = coordinatesTest.b;
+            if (input == null)
+            {
+                Console.WriteLine("Input is null.");
+            }
+            else if (a < 0 || b < 0 || a > board.Fields.GetLength(0)-1 || b > board.Fields.GetLength(0)-1)
+            {
+                Console.WriteLine("Invalid input; please follow the format A1, B10 etc");
+
+            }
+            else if (board.Fields[a, b] == null)
+            {
+                Console.WriteLine($"There are no pawns at {board.@ToString(coordinatesTest)}!");
+            }
+            else
+            {
+                correctInput = true;
+            }
         }
-        (int i, int j) coordinates = board.@ToCoordinates(input);
-        int i = coordinates.i;
-        int j = coordinates.j;
-        if (board.Fields[i,j] != null)
+        coordinates = board.@ToCoordinates(input);
+        i = coordinates.i;
+        j = coordinates.j;
+
+        if (board.Fields[i,j] != null && board.Fields[i,j].color == pawnColor)
         {
-            Console.WriteLine("Where would you like to move?");
-            input = @GetUserInput();
+            correctInput = false;
+
+            while (input.Length < 2 || correctInput == false)
+            {
+                Console.WriteLine("Where would you like to move?");
+                input = @GetUserInput();
+                (int a, int b) coordinatesTest = board.@ToCoordinates(input);
+                int a = coordinatesTest.a;
+                int b = coordinatesTest.b;
+
+                if (a < 0 || b < 0 || a > board.Fields.GetLength(0)-1 || b > board.Fields.GetLength(0)-1)
+                {
+                    Console.WriteLine("Invalid input; please follow the format A1, B10 etc");
+
+                }
+                else
+                {
+                    correctInput = true;
+                }
+            }
         }
         (int i, int j) second_coordinates = board.@ToCoordinates(input);
-        board.@MovePawn(coordinates, second_coordinates);
 
         
+        return board.@MovePawn(coordinates, second_coordinates, pawnColor);
+
+
 
     }
-	public void @CheckForWinner(Board board)
+	public bool @CheckForWinner(Board board)
 	{
         //Checks whether there is a winner after each round; also checks for draws
         int whitePawns = 0;
@@ -103,8 +145,9 @@ public class Game
         }
         if (whitePawns == 0 || blackPawns == 0)
         {
-            isWon = true;
-            if (whitePawns > blackPawns) {
+
+            if (whitePawns > blackPawns)
+            {
                 Console.WriteLine("Congratulations! White player won.");
             }
             else if (whitePawns > blackPawns)
@@ -115,18 +158,42 @@ public class Game
             {
                 Console.WriteLine("Game is a draw; all pawns have been pwned.");
             }
+            return true;
 
         }
+        else return false;
 	}
-	public void Round()
+	public void Round(Board board)
 	{
-		Console.WriteLine("Checks which player is next and whether there is a winner");
-	}
+        bool madeMove = false;
+        while (madeMove == false)
+        {
+            string pawnColor = board.whitePawn;
+            Console.WriteLine("White player's turn.");
+            madeMove = TryToMakeMove(board, pawnColor);
+        }
+        board.WriteBoard();
+        CheckForWinner(board);
+        madeMove = false;
+        while (madeMove == false)
+        {
+            string pawnColor = board.blackPawn;
+            Console.WriteLine("Black player's turn.");
+            madeMove = TryToMakeMove(board, pawnColor);
+        }
+        board.WriteBoard();
+        CheckForWinner(board);
+    }
 
     public string @GetUserInput()
     {
-        string input = Console.ReadLine();
-        if (input.ToUpper() == "Q" || input.ToUpper() == "QUIT")
+        string? input = Console.ReadLine();
+        if (input == null)
+        {
+            Console.WriteLine("Input is null");
+            return "?";
+        }
+        else if (input.ToUpper() == "Q" || input.ToUpper() == "QUIT")
         {
             Environment.Exit(0);
             return input;
