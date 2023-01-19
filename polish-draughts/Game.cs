@@ -46,7 +46,7 @@ public class Game
         Board board = new Board(n);
 
         board.WriteBoard();
-        while (CheckForWinner(board) == false)
+        while (!CheckForWinner(board))
         {
             Round(board);
 
@@ -161,7 +161,10 @@ public class Game
             return true;
 
         }
-        else return false;
+        else
+        {
+            return false;
+        }
 	}
 	public void Round(Board board)
 	{

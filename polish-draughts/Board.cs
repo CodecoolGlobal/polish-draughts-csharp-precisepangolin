@@ -216,6 +216,39 @@ public class Board
         }
     }
 
+    public bool IsDiagonal((int i, int j) coordinatesA, (int k, int l) coordinatesB)
+    {
+        int i = coordinatesA.i;
+        int j = coordinatesA.j;
+        int k = coordinatesB.k;
+        int l = coordinatesB.l;
+        if (Fields[i, j] != null && Fields[k, l] == null && Math.Abs(i - k) == Math.Abs(j - l))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public bool IsValidMove((int i, int j) coordinatesA, (int k, int l) coordinatesB, string pawnColor)
+    {
+        int i = coordinatesA.i;
+        int j = coordinatesA.j;
+        int k = coordinatesB.k;
+        int l = coordinatesB.l;
+        Pawn inBetween = Fields[(i + k) / 2, (j + l) / 2];
+        if (Math.Abs(i - k) == 1 || (Math.Abs(i - k) == 2 && inBetween != null && inBetween.color != pawnColor))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
     public bool @MovePawn((int i, int j) coordinatesA, (int k, int l) coordinatesB, string pawnColor)
     {
         int i = coordinatesA.i;
@@ -237,19 +270,18 @@ public class Board
             Console.WriteLine($"Please select a {verbalPawnColor} pawn!");
             return false;
         }
-        if (Fields[i,j] != null && Fields[k,l] == null && Math.Abs(i - k) == Math.Abs(j - l))
+        if (IsDiagonal(coordinatesA, coordinatesB))
         {
             Pawn inBetween = Fields[(i + k) / 2, (j + l) / 2];
 
-
-            if (Math.Abs(i - k) == 1 || (Math.Abs(i - k) == 2 && inBetween != null && inBetween.color != pawnColor))
+            if (IsValidMove(coordinatesA, coordinatesB, pawnColor))
             {
                 Fields[i, j] = null;
                 Fields[k, l] = new Pawn(pawnColor, (k, l));
                 Console.WriteLine($"Moved {verbalPawnColor} pawn from {@ToString(coordinatesA)} to {@ToString(coordinatesB)}.");
                 if (Math.Abs(i-k) == 2)
                 {
-                    @RemovePawn(((i + k) / 2, (j + l) / 2));
+                    @RemovePawn(inBetween.coordinates);
                 }
                 return true;
             }
