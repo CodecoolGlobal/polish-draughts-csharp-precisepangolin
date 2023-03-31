@@ -5,10 +5,10 @@ using System.Security.Cryptography.X509Certificates;
 
 public class Board
 {
-    public string whiteTile = "       ";
-    public string blackTile = "#######";
-    public string whitePawn = "(WHITE)";
-    public string blackPawn = "(BLACK)";
+    public string whiteTile = "w";
+    public string blackTile = "b";
+    public string whitePawn = "W";
+    public string blackPawn = "V";
     public int n;
     public Pawn[,] Fields;
     public string[,] emptyFields;
@@ -17,25 +17,8 @@ public class Board
     {
         string[,] emptyFields = new string[n, n];
 
-        // generate black empty fields
-        for (int i = 0; i < n; i += 2)
-        {
-            for (int j = 0; j < n; j += 2)
-            {
-                emptyFields[i, j] = blackTile;
-            }
-        }
-
-        for (int i = 1; i < n; i += 2)
-        {
-            for (int j = 1; j < n; j += 2)
-            {
-                emptyFields[i, j] = blackTile;
-            }
-        }
-
         // generate white empty fields
-        for (int i = 1; i < n; i += 2)
+        for (int i = 0; i < n; i += 2)
         {
             for (int j = 0; j < n; j += 2)
             {
@@ -43,11 +26,28 @@ public class Board
             }
         }
 
-        for (int i = 0; i < n; i += 2)
+        for (int i = 1; i < n; i += 2)
         {
             for (int j = 1; j < n; j += 2)
             {
                 emptyFields[i, j] = whiteTile;
+            }
+        }
+
+        // generate black empty fields
+        for (int i = 1; i < n; i += 2)
+        {
+            for (int j = 0; j < n; j += 2)
+            {
+                emptyFields[i, j] = blackTile;
+            }
+        }
+
+        for (int i = 0; i < n; i += 2)
+        {
+            for (int j = 1; j < n; j += 2)
+            {
+                emptyFields[i, j] = blackTile;
             }
         }
         return emptyFields;
@@ -56,8 +56,6 @@ public class Board
     public Pawn[,] GenerateBoard(int n)
     {
         Pawn[,] Fields = new Pawn[n, n];
-
-        //int rowsPerPlayer = Convert.ToInt32(Math.Round(Convert.ToDecimal((2 * n) / (n / 2))));
         int rowsPerPlayer = 4;
         if (n <= 8)
         {
@@ -67,22 +65,20 @@ public class Board
         // generate black pawns
         for (int i = 0; i < rowsPerPlayer; i += 2)
         {
-            for (int j = 0; j < n; j += 2)
-            {
-                Fields[i, j] = new Pawn(blackPawn, (i, j));
-            }
-        }
-
-        for (int i = 1; i < rowsPerPlayer; i += 2)
-        {
             for (int j = 1; j < n; j += 2)
             {
                 Fields[i, j] = new Pawn(blackPawn, (i, j));
             }
         }
-
+        for (int i = 1; i < rowsPerPlayer; i += 2)
+        {
+            for (int j = 0; j < n; j += 2)
+            {
+                Fields[i, j] = new Pawn(blackPawn, (i, j));
+            }
+        }
         // generate white pawns
-        for (int i = n - rowsPerPlayer; i < n; i += 2)
+        for (int i = n - rowsPerPlayer + 1; i < n; i += 2)
         {
             for (int j = 0; j < n; j += 2)
             {
@@ -90,7 +86,7 @@ public class Board
             }
         }
 
-        for (int i = n - rowsPerPlayer - 1; i < n; i += 2)
+        for (int i = n - rowsPerPlayer; i < n; i += 2)
         {
             for (int j = 1; j < n; j += 2)
             {
@@ -101,64 +97,14 @@ public class Board
         return Fields;
     }
 
-    public void WriteBoard()
-    {
-        //Console.Clear();
-        string writtenBoard = "";
-        string writtenBoardRows = "";
-        string iLetters = "   |";
-        string letterSeparator = "---+";
-        for (int i = 0; i < Fields.GetLength(0); i++)
-        {
-            string writtenBoardRow = $" {Convert.ToChar(i + 65)} |";
-            string rowSeparator = "---+";
-            letterSeparator += "---------+";
-            if (i < 9) { 
-                iLetters += ("    " + (i + 1) + "    |");
-            }
-            else
-            {
-                iLetters += ("    " + (i + 1) + "   |");
-            };
-
-            for (int j = 0; j < Fields.GetLength(1); j++)
-            {
-                writtenBoardRow += " ";
-                rowSeparator += "---------+";
-
-                if (Fields[i, j] != null)
-                {
-                    writtenBoardRow += Fields[i, j].color;
-                }
-                else
-                {
-                    writtenBoardRow += emptyFields[i,j];
-                }
-
-                writtenBoardRow += " |";
-            }
-            writtenBoardRow += "\n";
-            writtenBoardRows += writtenBoardRow;
-            rowSeparator += "\n";
-            writtenBoardRows += rowSeparator;
-        }
-        iLetters += "\n";
-        writtenBoard += iLetters;
-        letterSeparator += "\n";
-        writtenBoard += letterSeparator;
-        writtenBoard += writtenBoardRows;
-
-        Console.Write(writtenBoard);
-    }
-
-    public string @ToString((int i, int j) coordinates)
+    public string ToString((int i, int j) coordinates)
     {
         string letter = (Convert.ToChar(coordinates.i + 65)).ToString();
         string digit = (coordinates.j + 1).ToString();
         return letter + digit;
     }
 
-    public (int i, int j) @ToCoordinates(string input)
+    public (int i, int j) ToCoordinates(string input)
     {
         (int i, int j) coordinates;
         char letter;
@@ -191,28 +137,15 @@ public class Board
         return coordinates;
     }
 
-    public void @RemovePawn((int i, int j) coordinates)
+    public void RemovePawn((int i, int j) coordinates)
     {
         int i = coordinates.i;
         int j = coordinates.j;
         if (Fields[i, j] != null)
         {
             string removedColor = Fields[i, j].color;
-            string verbalRemovedColor;
-            if (removedColor == whitePawn)
-            {
-                verbalRemovedColor = "white";
-            }
-            else
-            {
-                verbalRemovedColor = "black";
-            }
             Fields[i, j] = null;
-            Console.WriteLine($"Removed {verbalRemovedColor} pawn from {@ToString(coordinates)}");
-        }
-        else
-        {
-            Console.WriteLine($"No pawns at ({i},{j})");
+            Console.WriteLine($"Removed {removedColor} pawn from {ToString(coordinates)}");
         }
     }
 
@@ -232,14 +165,18 @@ public class Board
         }
     }
 
-    public bool IsValidMove((int i, int j) coordinatesA, (int k, int l) coordinatesB, string pawnColor)
+    public bool IsValidMove((int i, int j) coordinatesA, (int k, int l) coordinatesB)
     {
+        if (!IsDiagonal(coordinatesA, coordinatesB))
+        {
+            return false;
+        }
         int i = coordinatesA.i;
         int j = coordinatesA.j;
         int k = coordinatesB.k;
         int l = coordinatesB.l;
         Pawn inBetween = Fields[(i + k) / 2, (j + l) / 2];
-        if (Math.Abs(i - k) == 1 || (Math.Abs(i - k) == 2 && inBetween != null && inBetween.color != pawnColor))
+        if (Math.Abs(i - k) == 1 || (Math.Abs(i - k) == 2 && inBetween != null && inBetween.color != Fields[i,j].color))
         {
             return true;
         }
@@ -249,56 +186,138 @@ public class Board
         }
     }
 
-    public bool @MovePawn((int i, int j) coordinatesA, (int k, int l) coordinatesB, string pawnColor)
+    public void MovePawn(Pawn pawn, (int k, int l) coordinatesB)
+    {
+        int i = pawn.coordinates.x;
+        int j = pawn.coordinates.y;
+        int k = coordinatesB.k;
+        int l = coordinatesB.l;
+        Pawn inBetween = Fields[(i + k) / 2, (j + l) / 2];
+        Fields[coordinatesB.k, coordinatesB.l] = new Pawn(pawn.symbol, coordinatesB);
+        Fields[i, j] = null;
+        if (inBetween != null)
+        {
+            RemovePawn(inBetween.coordinates);
+        }
+    }
+
+    public List<(int i, int j)> SuggestedPawn(string pawnColor)
+    {
+        List<Pawn> pawns = new List<Pawn>();
+        List<(int i, int j)> coordinates = new List<(int i, int j)>();
+        foreach (Pawn pawn in Fields)
+        {
+            if (pawn != null && pawn.color == pawnColor)
+            {
+                for (int i = 0; i < Fields.GetLength(0); i++)
+                {
+                    for (int j = 0; j < Fields.GetLength(1); j++)
+                    {
+                        if (IsValidMove(pawn.coordinates, (i, j)) && !pawns.Contains(pawn))
+                        {
+                            pawns.Add(pawn);
+                        }
+                    }
+                }
+            }
+        }
+        foreach (Pawn pawn in pawns)
+        {
+            coordinates.Add(pawn.coordinates);
+        }
+        return coordinates;
+    }
+
+    public List<(int i, int j)> SuggestedMove((int i, int j) coordinatesA)
+    {
+        List<(int i, int j)> suggestedMoves = new List<(int i, int j)>();
+        for (int i = 0; i < Fields.GetLength(0); i++)
+        {
+            for (int j = 0; j < Fields.GetLength(1); j++)
+            {
+                if (IsValidMove(coordinatesA, (i,j)))
+                {
+                    suggestedMoves.Add((i,j));
+                }
+            }
+
+        }
+        return suggestedMoves;
+    }
+
+    public bool CanJumpOver((int i, int j) coordinatesA, (int k, int l) coordinatesB, string pawnSymbol)
     {
         int i = coordinatesA.i;
         int j = coordinatesA.j;
         int k = coordinatesB.k;
         int l = coordinatesB.l;
-        string verbalPawnColor;
-        if (pawnColor == whitePawn)
-        { 
-            verbalPawnColor = "white"; }
-        else
+        Pawn inBetween = Fields[(i + k) / 2, (j + l) / 2];
+        if (inBetween != null && inBetween.symbol != pawnSymbol && Math.Abs(i - k) == 2)
         {
-            verbalPawnColor = "black";
-        };
-
-        if (Fields[i,j] != null && Fields[i, j].color != pawnColor)
-        {
-
-            Console.WriteLine($"Please select a {verbalPawnColor} pawn!");
-            return false;
-        }
-        if (IsDiagonal(coordinatesA, coordinatesB))
-        {
-            Pawn inBetween = Fields[(i + k) / 2, (j + l) / 2];
-
-            if (IsValidMove(coordinatesA, coordinatesB, pawnColor))
-            {
-                Fields[i, j] = null;
-                Fields[k, l] = new Pawn(pawnColor, (k, l));
-                Console.WriteLine($"Moved {verbalPawnColor} pawn from {@ToString(coordinatesA)} to {@ToString(coordinatesB)}.");
-                if (Math.Abs(i-k) == 2)
-                {
-                    @RemovePawn(inBetween.coordinates);
-                }
-                return true;
-            }
-            else
-            {
-                Console.WriteLine($"Cannot move pawn from {@ToString(coordinatesA)} to {@ToString(coordinatesB)}." +
-                    $" \n You cannot jump over your own pawns.");
-                return false;
-            }
-            
+            return true;
         }
         else
         {
-            Console.WriteLine($"Cannot move pawn from {@ToString(coordinatesA)} to {@ToString(coordinatesB)}." +
-                $" \nMake sure to move diagonally and that the place is not occupied.");
             return false;
         }
+    }
+
+    public bool WillBeJumped((int i, int j) coordinatesA, (int k, int l) coordinatesB, string pawnColor)
+    {
+        string pawnSymbol;
+        string enemyPawnSymbol;
+        bool jumpedFlag = false;
+        bool deletedFlag = false;
+        if (pawnColor == "white")
+        {
+            pawnSymbol = whitePawn;
+            enemyPawnSymbol = blackPawn;
+        }
+        else
+        {
+            pawnSymbol = blackPawn;
+            enemyPawnSymbol = whitePawn;
+        }
+        int i = coordinatesA.i;
+        int j = coordinatesA.j;
+        int k = coordinatesB.k;
+        int l = coordinatesB.l;
+        Pawn inBetween = Fields[(i + k) / 2, (j + l) / 2];
+        if (k < 9 && l < 9 && k > 0 && l > 0 && Fields[k, l] == null && Fields[i, j].color == pawnColor)
+        {
+            Fields[i, j] = null;
+            Fields[k, l] = new Pawn(pawnSymbol, coordinatesB);
+
+            if (inBetween != null && inBetween.symbol != pawnSymbol && Math.Abs(i - k) == 2)
+            {
+                deletedFlag = true;
+                inBetween = null;
+            }
+
+            if (CanJumpOver((k+1,l+1), (k -1, l -1), enemyPawnSymbol))
+            {
+                jumpedFlag = true;
+            }
+            else if (CanJumpOver((k + 1, l -1), (k -1, l + 1), enemyPawnSymbol))
+            {
+                jumpedFlag = true;
+            }
+            else if (CanJumpOver((k -1, l + 1), (k + 1, l - 1), enemyPawnSymbol))
+            {
+                jumpedFlag = true;
+            }
+            else if (CanJumpOver((k -1, l -1), (k + 1, l + 1), enemyPawnSymbol))
+            {
+                jumpedFlag = true;
+            }
+        }
+        if (deletedFlag == true)
+        {
+            Fields[(i + k) / 2, (j + l) / 2] = new Pawn(enemyPawnSymbol, ((i + k) / 2, (j + l) / 2));
+        }
+        Fields[i, j] = new Pawn(pawnSymbol, coordinatesA);
+        Fields[k, l] = null;
+        return jumpedFlag;
     }
 
     public Board(int n)

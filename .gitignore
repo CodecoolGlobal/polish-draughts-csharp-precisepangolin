@@ -1,3 +1,5 @@
 ﻿.vs
 bin/Debug/net6.0
 bin/
+obj/
+obj/Debug

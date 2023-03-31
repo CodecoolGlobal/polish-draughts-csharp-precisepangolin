@@ -2,14 +2,23 @@
 
 public class Pawn
 {
-    public string color;
+    public string symbol;
     public (int x, int y) coordinates;
     public bool IsCrowned;
+    public string color;
 
-    public Pawn(string color, (int x, int y) coordinates)
+    public Pawn(string symbol, (int x, int y) coordinates)
     {
-        this.color = color;
+        this.symbol = symbol;
         this.coordinates = coordinates;
+        if (symbol == "W")
+        {
+            color = "white";
+        }
+        else
+        {
+            color = "black";
+        }
     }
 
 }
