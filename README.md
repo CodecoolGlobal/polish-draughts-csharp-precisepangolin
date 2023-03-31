@@ -26,8 +26,9 @@ dotnet build
 ![draughts](https://user-images.githubusercontent.com/61357898/213881169-3ab0da07-de35-4e69-a67a-dcc779655644.PNG)
 <img src="https://user-images.githubusercontent.com/61357898/213881172-9e2c5815-b7f5-4022-980c-89ea045985f2.png" width=35% height=35%>
 <img src="https://user-images.githubusercontent.com/61357898/213881175-d8a2d21e-4ae3-42c5-a69e-f9f529138d7e.png" width=60% height=60%>
+* Animated gif:
 
-
+![draughts](https://user-images.githubusercontent.com/61357898/214289698-732aebbb-7ea3-48e5-adc5-6fb73f3a1201.gif)
 
 ## Credits
 Credit to Codecool for providing instructions.
