@@ -10,6 +10,7 @@
 A game of Polish Draughts (also called International Draughts) written in C# using Object Oriented Programming.
 
 Includes enforced rules, incorrect input handling, winning conditions, console-compatible board layout and a customizable board size.
+
 Also includes AI gameplay (AI vs AI).
 * now with nicer graphics!
 
